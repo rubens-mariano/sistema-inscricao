@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revisão da Inscrição</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static '/css/revisarInsc.css' %}">
+</head>
+<body>
+    <form action="{% url 'revisar_inscricao' %}" method="POST">
+        {% csrf_token %}
+        <h1>Revisão da Inscrição</h1>
+
+        <div class="card">
+            <h2>Disciplinas Selecionadas</h2>
+            <ul class="disciplinas-list">
+                <!-- As disciplinas selecionadas serão adicionadas aqui -->
+                <li>Qualidade de Software</li>
+                <li>Serviços de Rede</li>
+                <li>Desenvolvimento Web</li>
+                <li>Gestão de Projetos</li>
+                <li>Metodologias Ágeis</li>
+                <li>Projetos de Sistema</li>
+                <!-- Adicione mais disciplinas conforme necessário -->
+            </ul>
+        </div>
+
+        <div class="submit-container">
+            <button class="submit-button" onclick="window.history.back()">Voltar</button>
+            <button class="submit-button" type="submit">Confirmar Inscrição</button>
+        </div>
+    </form>
+    {% include 'partials/_alertas.html' %}
+</body>
+</html>

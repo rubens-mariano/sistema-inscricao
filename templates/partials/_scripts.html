@@ -1,0 +1,49 @@
+{% load static %}
+<!-- jQuery -->
+<script src="{% static '/assets/plugins/jquery/jquery.min.js' %}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{% static '/assets/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+<!-- Toastr -->
+<script src="{% static '/assets/plugins/toastr/toastr.min.js' %}"></script>
+<script>
+    $(function () {
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "8000",
+            "extendedTimeOut": "8000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+
+        {% if messages %}
+            {% for message in messages %}
+                toastr['{{ message.tags }}']('{{ message }}')
+            {% endfor %}
+        {% endif %}
+    });
+    
+    $(document).ready(function(){
+        $('#meuModal').on('show.bs.modal', function (event) {
+            $.ajax({
+                url: "{% url 'minha_view' %}",  // Use o nome que você deu para a view na configuração de URLs.
+                type: 'get',
+                dataType: 'json',
+                success: function (data) {
+                    // Aqui você tem acesso aos dados retornados pela sua view.
+                    // Use jQuery para preencher os elementos do modal com esses dados.
+                    $('.modal-body').text(data.campo);
+                }
+            });
+        });
+    });
+</script>

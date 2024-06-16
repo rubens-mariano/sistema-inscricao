@@ -1,0 +1,14 @@
+{% extends 'inscricao/base.html' %}
+{% block content %}
+    <h1>Confirmação de Inscrições</h1>
+    <p>As seguintes disciplinas foram selecionadas:</p>
+    <ul>
+        {% for turma in turmas %}
+                <li>{{ turma.nome }} ({{ turma.professor }}, {{ turma.get_dia_semana_display }}({{ turma.horario_inicial|time:"H:i" }} - {{ turma.horario_final|time:"H:i" }}), Sala {{ turma.sala.numero }}, Código: {{ turma.disciplina.codigo }})</li>
+        {% endfor %}
+    </ul>
+    <form action="{% url 'revisar_inscricao' %}" method="POST">
+    {% csrf_token %}
+        <button type="submit">Confirmar e Prosseguir para Pagamento</button>
+    </form>
+{% endblock %}

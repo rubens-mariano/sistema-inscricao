@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolha de Turmas</title>
+    <link rel="stylesheet" href="{% static '/css/inscricaoturmas.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <form action="{% url 'turmas' %}" method="POST">
+        {% csrf_token %}
+        <h1 class="titulo">Escolha de Turmas</h1>
+        <div class="espaco"></div> 
+        <div class="container">
+            {% for field in form.visible_fields %}
+                {% for turma in field.field.queryset %}
+                    <div class="card">
+                        <h2 class="titulo-disciplina">{{ turma.disciplina.nome }}</h2>
+                        <p class="info">Professor: {{ turma.professor }}</p>
+                        <p class="info">Horário: {{ turma.get_dia_semana_display }}, {{ turma.horario_inicial|time:"H:i" }} - {{ turma.horario_final|time:"H:i" }}</p>
+                        <p class="info">Local: Sala {{ turma.sala.numero }}</p>
+                        <input type="checkbox" id="{{ field.auto_id }}_{{ turma.id }}" name="{{ field.name }}" value="{{ turma.id }}">
+                        <label for="{{ field.auto_id }}_{{ turma.id }}">Selecionar disciplina</label>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <div class="submit-container">
+            <button class="submit-button" type="submit">Submeter escolhas</button>
+        </div>
+    </form>
+    {% include 'partials/_alertas.html' %}
+</body>
+</html>

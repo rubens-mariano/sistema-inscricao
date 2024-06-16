@@ -1,0 +1,30 @@
+{% extends 'inscricao/base.html' %}
+{% block content %}
+    <h1>Disciplinas Completadas</h1>
+    <form action="{% url 'disciplinas' %}" method="POST">
+    {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Selecionar</th>
+                    <th>Disciplina</th>
+                    <th>Ano</th>
+                    <th>Nota</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for field in form %}
+                {% for disciplina in field.field.queryset %}
+                    <tr>
+                        <td><input type="checkbox" id="{{ field.auto_id }}_{{ disciplina.id }}" name="{{ field.name }}" value="{{ disciplina.id }}"></td>
+                        <td>{{ disciplina.nome }}</td>
+                        <td>{{ disciplina.ano }}</td>
+                        <td>8.5</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Próximo</button>
+    </form>
+{% endblock %}

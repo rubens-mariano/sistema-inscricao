@@ -1,0 +1,34 @@
+{% extends 'inscricao/base.html' %}
+{% block content %}
+    <h1>Seleção de Turmas</h1>
+    <form action="{% url 'turmas' %}" method="POST">
+    {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Selecionar</th>
+                    <th>Disciplina</th>
+                    <th>Professor</th>
+                    <th>Horário</th>
+                    <th>Local</th>
+                    <th>Código da Turma</th>
+                </tr>
+            </thead>
+            <tbody>
+             {% for field in form %}
+                {% for turma in field.field.queryset %}
+                    <tr>
+                        <td><input type="checkbox" id="{{ field.auto_id }}_{{ turma.id }}" name="{{ field.name }}" value="{{ turma.id }}"></td>
+                        <td>{{ turma.disciplina.nome }}</td>
+                        <td>{{ turma.professor }}</td>
+                        <td>{{ turma.get_dia_semana_display }}, {{ turma.horario_inicial|time:"H:i" }} - {{ turma.horario_final|time:"H:i" }}</td>
+                        <td>Sala {{ turma.sala.numero }}</td>
+                        <td>{{ turma.disciplina.codigo }}</td>
+                    </tr>
+                {% endfor %}
+             {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Próximo</button>
+    </form>
+{% endblock %}

@@ -97,7 +97,8 @@ def revisar_inscricao_view(request):
     else:
         lista_turmas = inscricao_temporaria.turmas.all()
         lista_espera = get_lista_espera(aluno, lista_turmas).values('turma__codigo')
-        lista_turmas = [turma for turma in lista_turmas if turma.codigo not in lista_espera[0]['turma__codigo']]
+        if lista_espera:
+            lista_turmas = [turma for turma in lista_turmas if turma.codigo not in lista_espera[0]['turma__codigo']]
 
     if len(lista_turmas) > 0:
 

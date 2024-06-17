@@ -30,7 +30,7 @@ scheduler.add_jobstore(DjangoJobStore(), "default")
 
 scheduler.add_job(
     limpar_dados_temporarios_inscricao,
-    trigger=CronTrigger(minute="*/5"),
+    trigger=CronTrigger(hour="*/1"),
     id="limpar_dados_temporarios_inscricao",
     max_instances=1,
     replace_existing=True,
@@ -38,7 +38,7 @@ scheduler.add_job(
 
 scheduler.add_job(
     delete_old_job_executions,
-    trigger=CronTrigger(minute="*/6"),
+    trigger=CronTrigger(hour="*/2"),
     id="delete_old_job_executions",
     max_instances=1,
     replace_existing=True,

@@ -10,5 +10,6 @@
     <form action="{% url 'revisar_inscricao' %}" method="POST">
     {% csrf_token %}
         <button type="submit">Confirmar e Prosseguir para Pagamento</button>
+        <button type="button" onClick="window.location.href='{% url 'turmas' %}'">Voltar para a seleção</button>
     </form>
 {% endblock %}

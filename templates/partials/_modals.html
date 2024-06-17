@@ -1,17 +1,38 @@
-<div id="modalListaEspera" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Conteúdo do modal-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Título Modal</h4>
-            </div>
-            <div class="modal-body">
-                <p>Algum texto no modal.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+<!-- Modal -->
+<div id="modalAddListaEspera" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <form action="{% url 'lista_de_espera' %}" method="POST">
+                {% csrf_token %}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Turmas Indisponíveis</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>As seguintes turmas estão indisponíveis:</p>
+                        <ul id="turmasList">
+                            {% for field in form_lista_espera %}
+                                {% for turma in field.field.queryset %}
+                                    <li>
+                                        <input type="checkbox" id="{{ field.auto_id }}_{{ turma.id }}" name="{{ field.name }}" value="{{ turma.id }}">
+                                        <label for="{{ field.auto_id }}_{{ turma.id }}">
+                                            {{ turma.nome }} ({{ turma.professor }},
+                                            {{ turma.get_dia_semana_display }}({{ turma.horario_inicial|time:"H:i" }} - {{ turma.horario_final|time:"H:i" }}),
+                                            Sala {{ turma.sala.numero }},
+                                            Código: {{ turma.disciplina.codigo }})
+                                        </label>
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Adicionar à lista de espera</button>
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </div>
 </div>

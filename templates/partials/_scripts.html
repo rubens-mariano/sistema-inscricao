@@ -5,6 +5,9 @@
 <script src="{% static '/assets/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
 <!-- Toastr -->
 <script src="{% static '/assets/plugins/toastr/toastr.min.js' %}"></script>
+<!-- Bootstrap 5 -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 <script>
     $(function () {
         toastr.options = {
@@ -31,19 +34,13 @@
             {% endfor %}
         {% endif %}
     });
-    
-    $(document).ready(function(){
-        $('#meuModal').on('show.bs.modal', function (event) {
-            $.ajax({
-                url: "{% url 'minha_view' %}",  // Use o nome que você deu para a view na configuração de URLs.
-                type: 'get',
-                dataType: 'json',
-                success: function (data) {
-                    // Aqui você tem acesso aos dados retornados pela sua view.
-                    // Use jQuery para preencher os elementos do modal com esses dados.
-                    $('.modal-body').text(data.campo);
-                }
-            });
-        });
-    });
+
+
+    window.onload = function() {
+        let turmasLength = {{ lista_turmas_indisponiveis|length }};
+        if(turmasLength > 0) {
+            console.log("Erro de disciplina")
+            $('#modalAddListaEspera').modal('show');
+        }
+    };
 </script>

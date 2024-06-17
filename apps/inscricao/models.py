@@ -77,7 +77,6 @@ class Aluno(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(20)]
     )
     turmas = models.ManyToManyField(Turma, blank=True)
-    disciplinas_cursadas = models.ManyToManyField(Disciplina, blank=True)
 
     def __str__(self):
         return f'{self.matricula}, {self.nome}'

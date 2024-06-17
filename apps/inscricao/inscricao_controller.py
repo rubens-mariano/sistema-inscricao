@@ -1,5 +1,5 @@
 from django.db.models import Sum
-from apps.inscricao.models import Aluno, OfertaDisciplina, Turma, SelecaoTemporaria
+from apps.inscricao.models import Aluno, OfertaDisciplina, Turma, SelecaoTemporaria, ListaEspera
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -95,18 +95,75 @@ def verifica_creditos(aluno_id, lista_turmas):
     if aluno and turmas:
         total_consumo_creditos = turmas['total_consumo_creditos'] or 0
         return (aluno.creditos - total_consumo_creditos) >= 0
+
     return False
 
 
-def inscrever(aluno_id, lista_turmas):
+def verifica_choque_horario(lista_turmas):
+    """
+    Função para verificar se há choque de horários entre as turmas.
+    """
+
+    choques = []
+    lista_turmas = [get_turma(turma) for turma in lista_turmas]
+    horarios = []
+    dias_semana = []
+    for turma in lista_turmas:
+        horarios.append((turma.horario_inicial, turma.horario_final))
+        dias_semana.append(turma.dia_semana)
+
+    for i in range(len(horarios)):
+        for j in range(i + 1, len(horarios)):
+            if ((horarios[i][0] < horarios[j][1] and horarios[i][1] > horarios[j][0]) and
+                    (dias_semana[i] == dias_semana[j])):
+                choques.append((lista_turmas[i], lista_turmas[j]))
+    return choques
+
+
+def get_espera(aluno_id, turma):
+    try:
+        return ListaEspera.objects.get(aluno=aluno_id, turma=turma)
+    except ListaEspera.DoesNotExist:
+        return None
+
+
+def get_lista_espera(aluno_id, lista_turmas):
+    try:
+        return ListaEspera.objects.filter(aluno=aluno_id, turma__in=lista_turmas)
+    except ListaEspera.DoesNotExist:
+        return None
+
+
+def adicionar_lista_espera(aluno_id, lista_turmas):
+    try:
+        lista = ListaEspera.objects.all()
+        ultima_posicao = 0
+        em_espera = []
+
+        if lista:
+            ultima_posicao = lista.last().posicao
+
+        for turma in lista_turmas:
+            espera = get_espera(aluno_id, turma)
+            if not espera:
+                ListaEspera.objects.create(aluno=aluno_id, turma=turma,
+                                           disciplina=turma.disciplina, posicao=ultima_posicao + 1)
+            else:
+                em_espera.append(turma)
+
+        return em_espera
+
+    except ListaEspera.DoesNotExist:
+        raise ListaEspera.DoesNotExist
+
+
+def inscrever(aluno, lista_turmas):
     """
     Função para inscrever o aluno nas turmas.
     """
-    inscricao_temporaria = SelecaoTemporaria.objects.filter(aluno=aluno_id).last()
-    aluno = get_aluno(aluno_id)
 
-    if aluno and inscricao_temporaria:
-        aluno.turmas.set(inscricao_temporaria.turmas.all())
+    if aluno and lista_turmas:
+        aluno.turmas.set(lista_turmas)
 
         disciplinas = [turma.disciplina for turma in lista_turmas]
         turmas_ofertadas = OfertaDisciplina.objects.filter(disciplina__in=disciplinas)
@@ -116,5 +173,6 @@ def inscrever(aluno_id, lista_turmas):
             turma.save()
 
         aluno.save()
+        return True
     else:
-        print('Não foi possível inscrever o aluno. Verifique a inscrição temporária e os dados do aluno.')
+        return False

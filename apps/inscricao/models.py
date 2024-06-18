@@ -17,6 +17,9 @@ class Disciplina(models.Model):
     )
     ano = models.IntegerField(null=False, blank=False, default=timezone.now().year)
 
+    class Meta:
+        unique_together = ('codigo',)
+
     def __str__(self):
         return f'{self.codigo} - {self.nome}'
 
@@ -24,6 +27,9 @@ class Disciplina(models.Model):
 class Sala(models.Model):
     numero = models.CharField(max_length=20, null=False, blank=False)
     capacidade = models.IntegerField()
+
+    class Meta:
+        unique_together = ('numero',)
 
     def __str__(self):
         return f'{self.numero}, {self.capacidade}'
@@ -38,6 +44,9 @@ class OfertaDisciplina(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(40)]
     )
     inscritos = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('disciplina',)
 
     def __str__(self):
         return f'{self.disciplina.nome}, {self.vagas}'
@@ -62,6 +71,9 @@ class Turma(models.Model):
     horario_inicial = models.TimeField(null=False, blank=False)
     horario_final = models.TimeField(null=False, blank=False)
     sala = models.ForeignKey(to=Sala, on_delete=models.CASCADE, null=False, blank=False)
+
+    class Meta:
+        unique_together = ('codigo',)
 
     def __str__(self):
         return f'{self.codigo}, {self.nome}, {self.disciplina}'
@@ -93,8 +105,22 @@ class ListaEspera(models.Model):
     )
     turma = models.ForeignKey(to=Turma, on_delete=models.CASCADE, null=False, blank=False)
 
+    class Meta:
+        unique_together = ('aluno', 'disciplina', 'turma')
+
     def __str__(self):
         return f'{self.aluno.matricula}, {self.disciplina.nome}, {self.posicao}, {self.turma}'
+
+
+class Inscricao(models.Model):
+    turmas = models.ManyToManyField(Turma)
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, null=False, blank=False)
+    data = models.DateTimeField(auto_now=True)
+    ano = models.IntegerField(default=timezone.now().year, null=False, blank=False)
+    semestre = models.IntegerField(null=False, blank=False)
+
+    class Meta:
+        unique_together = ('aluno', 'ano',)
 
 
 class SelecaoTemporaria(models.Model):
@@ -102,6 +128,9 @@ class SelecaoTemporaria(models.Model):
     disciplinas = models.ManyToManyField('Disciplina')
     turmas = models.ManyToManyField('Turma')
     criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('aluno',)
 
     def is_expired(self):
         return timezone.now() > self.criado_em + timedelta(hours=1)

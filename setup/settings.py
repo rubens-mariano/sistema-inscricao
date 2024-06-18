@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     # Aplicativos externos
     'django_bootstrap5',
     'django_apscheduler',
+    'pytest',
+    'django_extensions',
+    'coverage',
 ]
 
 MIDDLEWARE = [

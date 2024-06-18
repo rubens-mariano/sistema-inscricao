@@ -1,4 +1,7 @@
+from django.contrib import messages
 from django.db.models import Sum
+from django.shortcuts import redirect
+
 from apps.inscricao.models import Aluno, OfertaDisciplina, Turma, SelecaoTemporaria, ListaEspera
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -63,6 +66,14 @@ def get_total_consumo_creditos(lista_turmas):
         total_consumo_creditos=Sum('disciplina__credito'))
 
 
+def get_inscricao_temporaria_or_redirect(request, aluno_id):
+    inscricao_temporaria = get_inscricao_temporaria(aluno_id)
+    if inscricao_temporaria is None:
+        messages.error(request, 'Nenhuma inscrição temporária encontrada')
+        return None, redirect('disciplinas')
+    return inscricao_temporaria, None
+
+
 def tem_vagas_disponiveis(oferta_disciplina):
     """
     Função para verificar se ainda há vagas disponíveis em uma oferta de disciplina.
@@ -85,11 +96,10 @@ def verifica_disponibilidade(lista_turmas):
     return lista_turmas_indisponiveis
 
 
-def verifica_creditos(aluno_id, lista_turmas):
+def verifica_creditos(aluno, lista_turmas):
     """
     Função para verificar os créditos do aluno.
     """
-    aluno = get_aluno(aluno_id)
     turmas = get_total_consumo_creditos(lista_turmas)
 
     if aluno and turmas:

@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 from apps.inscricao.forms import FormularioSelecaoDisciplina, FormularioSelecaoTurma, FormularioListaEspera
-from apps.inscricao.models import SelecaoTemporaria, Aluno, ListaEspera, Disciplina
+from apps.inscricao.models import SelecaoTemporaria
 from apps.inscricao.inscricao_controller import (verifica_creditos, verifica_disponibilidade,
                                                  inscrever, get_inscricao_temporaria,
                                                  get_aluno, adicionar_lista_espera, verifica_choque_horario,
-                                                 get_lista_espera)
+                                                 get_lista_espera, get_inscricao_temporaria_or_redirect)
 
 
 def list_disciplinas_view(request):
@@ -35,13 +35,12 @@ def list_turmas_disciplinas_view(request):
     View para listar turmas e disciplinas.
     """
 
-    aluno_id = 1
-    inscricao_temporaria = get_inscricao_temporaria(aluno_id)
+    aluno = get_aluno(1)
     lista_turmas_indisponiveis = []
+    inscricao_temporaria, redirect_response = get_inscricao_temporaria_or_redirect(request, aluno_id)
 
-    if inscricao_temporaria is None:
-        messages.error(request, 'Nenhuma inscrição temporária encontrada')
-        return redirect('disciplinas')
+    if redirect_response:
+        return redirect_response
 
     lista_disciplinas = inscricao_temporaria.disciplinas.values_list('id', flat=True)
     form = FormularioSelecaoTurma(disciplinas=lista_disciplinas)
@@ -63,7 +62,7 @@ def list_turmas_disciplinas_view(request):
                               {'form': form, 'form_lista_espera': form_lista_espera,
                                'lista_turmas_indisponiveis': lista_turmas_indisponiveis})
 
-            if not verifica_creditos(aluno_id, lista_turmas):
+            if not verifica_creditos(aluno, lista_turmas):
                 messages.error(request, 'Ultrapassou a quantidade de créditos disponíveis')
                 return redirect('turmas')
 
@@ -86,11 +85,9 @@ def revisar_inscricao_view(request):
     """
 
     aluno = get_aluno(1)
-    inscricao_temporaria = get_inscricao_temporaria(aluno)
-
-    if inscricao_temporaria is None:
-        messages.error(request, 'Nenhuma inscrição temporária encontrada')
-        return redirect('disciplinas')
+    inscricao_temporaria, redirect_response = get_inscricao_temporaria_or_redirect(request, aluno.id)
+    if redirect_response:
+        return redirect_response
 
     if inscricao_temporaria is None or inscricao_temporaria.is_expired():
         lista_turmas = []

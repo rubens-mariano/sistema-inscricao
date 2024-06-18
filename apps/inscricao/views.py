@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-
 from apps.inscricao.forms import FormularioSelecaoDisciplina, FormularioSelecaoTurma, FormularioListaEspera
 from apps.inscricao.models import SelecaoTemporaria
 from apps.inscricao.inscricao_controller import (verifica_creditos, verifica_disponibilidade,
-                                                 inscrever, get_inscricao_temporaria,
-                                                 get_aluno, adicionar_lista_espera, verifica_choque_horario,
+                                                 inscrever, get_aluno, adicionar_lista_espera, verifica_choque_horario,
                                                  get_lista_espera, get_inscricao_temporaria_or_redirect)
 
 
@@ -37,7 +35,7 @@ def list_turmas_disciplinas_view(request):
 
     aluno = get_aluno(1)
     lista_turmas_indisponiveis = []
-    inscricao_temporaria, redirect_response = get_inscricao_temporaria_or_redirect(request, aluno_id)
+    inscricao_temporaria, redirect_response = get_inscricao_temporaria_or_redirect(request, aluno)
 
     if redirect_response:
         return redirect_response

@@ -129,9 +129,6 @@ class SelecaoTemporaria(models.Model):
     turmas = models.ManyToManyField('Turma')
     criado_em = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('aluno',)
-
     def is_expired(self):
         return timezone.now() > self.criado_em + timedelta(hours=1)
 
@@ -139,6 +136,4 @@ class SelecaoTemporaria(models.Model):
     def clean_expired_selections(cls):
         expiration_time = timezone.now() - timedelta(minutes=2)
         expired_selections = SelecaoTemporaria.objects.filter(criado_em__lt=expiration_time)
-        count = expired_selections.count()
         expired_selections.delete()
-        print(f'{count} seleções temporárias expiradas foram removidas.')
